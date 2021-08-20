@@ -52,7 +52,7 @@ Public Class FrmMain
             Return
         End If
 
-        LoadFile(OpenFileDialog1.FileName)
+        LoadDeck(OpenFileDialog1.FileName)
         CheckForTestability()
         CurrentCard = ShuffledDeck(ShuffledDeck.Count - 1)
         NextCard()

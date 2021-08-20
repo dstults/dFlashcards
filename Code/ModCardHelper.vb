@@ -58,58 +58,38 @@
         ReDim Preserve theDeck(deckTotal)
     End Sub
 
-    Public Sub LoadFile(theFile As String)
-        Dim fileNum As Integer, strTemp As String, intX As Integer
-        Dim lineCnt As Integer, errCnt As Integer
+    Public Sub LoadDeck(filePath As String)
+        Dim errorCount As Integer = 0
+        Dim currentLineNumber As Integer = 0
 
         ClearCards()
 
-        fileNum = FreeFile()
-        intX = 0
+        Dim fileData As String = IO.File.ReadAllText(filePath)
+        Dim fileLines As String() = fileData.Split(vbNewLine)
+        Dim newDeck As New List(Of ClsCard)
 
-        FileOpen(fileNum, theFile, OpenMode.Input)
-        Do Until EOF(fileNum)
-            strTemp = LineInput(fileNum)
-            lineCnt = lineCnt + 1
-            If Not AddCard(strTemp) Then
-                ' If unable to parse card data
-                errCnt = errCnt + 1
-                MsgBox("Invalid Card Data (Line " & Format(lineCnt, "0") & "):" & vbNewLine & strTemp)
-                If errCnt >= 3 Then
+        For Each line As String In fileLines
+            currentLineNumber += 1
+            Dim lineData As String() = line.Split("|"c)
+            If lineData.Length <= 1 OrElse lineData.Length > 3 Then
+                MsgBox($"Invalid Card Data (Line {currentLineNumber}): {vbNewLine}{line}")
+                If errorCount >= 3 Then
                     MsgBox("Too many errors, aborting file load!")
-                    ClearCards()
                     Exit Sub
                 End If
+            ElseIf lineData.Length = 2 Then
+                newDeck.Add(New ClsCard(lineData(0), lineData(1)))
+            ElseIf lineData.Length = 3 Then
+                newDeck.Add(New ClsCard(lineData(0), lineData(1), lineData(2)))
             End If
+        Next
 
-        Loop
-
-        FileClose(fileNum)
-
-        If FlashcardDeck.Count > 0 Then
+        If newDeck.Count > 0 Then
+            ShuffledDeck = newDeck
             ShuffleDeck()
-            CurrentCard = ShuffledDeck(0)
         End If
 
     End Sub
-
-    Private Function AddCard(inString As String) As Boolean
-        Dim parsedString() As String = inString.Split("|"c)
-
-        If parsedString.Length = 2 Then
-            FlashcardDeck.Add(New ClsCard(parsedString(0), parsedString(1)))
-            Return True
-        ElseIf parsedString.Length = 3 Then
-            FlashcardDeck.Add(New ClsCard(parsedString(0), parsedString(1), parsedString(2)))
-            Return True
-        ElseIf inString = "" Then
-            Return True
-            'Beep()
-        Else
-            Return False
-        End If
-
-    End Function
 
     Public Sub ClearCards()
         FlashcardDeck.Clear()
