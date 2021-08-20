@@ -14,7 +14,7 @@
                 MsgBox("You have memorized all the cards!" & vbNewLine & vbNewLine & "Now do it again!", vbOKOnly, "Congratulations!")
                 ShuffleDeck()
             Else
-                If Left_Tested And nextCard.Left_NeedsTesting Then nextSides.Add(CardSide.Left)
+                If Left_Tested And nextCard.LeftNeedsTesting Then nextSides.Add(CardSide.Left)
                 If Middle_Tested And nextCard.Middle_NeedsTesting Then nextSides.Add(CardSide.Middle)
                 If Right_Tested And nextCard.Right_NeedsTesting Then nextSides.Add(CardSide.Right)
                 If nextSides.Count > 0 Then
@@ -94,22 +94,17 @@
     End Sub
 
     Private Function AddCard(inString As String) As Boolean
-        Dim parsedString() As String
-        parsedString = Split(inString, "|")
+        Dim parsedString() As String = inString.Split("|"c)
+
         If parsedString.Length = 2 Then
-            FlashcardDeck.Add(New ClsCard)
-            If parsedString(0) <> "" Then FlashcardDeck.Last.Left = parsedString(0)
-            If parsedString(1) <> "" Then FlashcardDeck.Last.Right = parsedString(1)
+            FlashcardDeck.Add(New ClsCard(parsedString(0), parsedString(1)))
             Return True
         ElseIf parsedString.Length = 3 Then
-            FlashcardDeck.Add(New ClsCard)
-            If parsedString(0) <> "" Then FlashcardDeck.Last.Left = parsedString(0)
-            If parsedString(1) <> "" Then FlashcardDeck.Last.Middle = parsedString(1)
-            If parsedString(2) <> "" Then FlashcardDeck.Last.Right = parsedString(2)
+            FlashcardDeck.Add(New ClsCard(parsedString(0), parsedString(1), parsedString(2)))
             Return True
         ElseIf inString = "" Then
             Return True
-            Beep()
+            'Beep()
         Else
             Return False
         End If

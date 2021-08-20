@@ -41,19 +41,22 @@ Public Class FrmMain
 
         If optionPicked = vbCancel Then
             'MsgBox("Operation cancelled!")
-        ElseIf optionPicked = vbOK Then
-            If Dir(OpenFileDialog1.FileName) <> "" Then
-                LoadFile(OpenFileDialog1.FileName)
-                CheckForTestability()
-                CurrentCard = ShuffledDeck(ShuffledDeck.Count - 1)
-                NextCard()
-                UpdateDisplay()
-            Else
-                MsgBox("File not found:" & vbNewLine & OpenFileDialog1.FileName)
-            End If
-        Else
-            MsgBox("Unknown dialogue operation!" & vbNewLine & "(Code: " & Format(optionPicked, "0") & ")")
+            Return
         End If
+        If optionPicked <> vbOK Then
+            MsgBox("Unknown dialogue operation!" & vbNewLine & "(Code: " & Format(optionPicked, "0") & ")")
+            Return
+        End If
+        If Dir(OpenFileDialog1.FileName) = "" Then
+            MsgBox("File not found:" & vbNewLine & OpenFileDialog1.FileName)
+            Return
+        End If
+
+        LoadFile(OpenFileDialog1.FileName)
+        CheckForTestability()
+        CurrentCard = ShuffledDeck(ShuffledDeck.Count - 1)
+        NextCard()
+        UpdateDisplay()
 
     End Sub
 
