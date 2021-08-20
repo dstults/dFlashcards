@@ -2,30 +2,14 @@
 Public Class FrmMain
 
     Private LastToggledTest As Integer
-    Private VersionSplash As String = "2019-01-23 / v1.0.2"
+    Private VersionSplash As String = "2021-08-20 / v1.1.0"
     'Public fG As Graphics = Me.CreateGraphics
+    Public TestLeft As Boolean = True
+    Public TestMiddle As Boolean = True
+    Public TestRight As Boolean = True
 
     Private Sub FrmMain_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
         Application.Exit()
-    End Sub
-
-    Private Sub FrmMain_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-        Select Case e.KeyCode
-            Case 219
-                DoBack()
-            Case 221
-                DoNext()
-            Case 32, 65
-                DoShowCards()
-            Case 83
-                DoGood()
-            Case 68
-                DoSlow()
-            Case 70
-                DoBad()
-                'Case Else
-                'MsgBox("keyCode: " & e.KeyCode & vbNewLine & "keyData: " & e.KeyData & vbNewLine & "keyValue: " & e.KeyValue)
-        End Select
     End Sub
 
     Private Sub FlashMan_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -52,37 +36,16 @@ Public Class FrmMain
             Return
         End If
 
-        LoadDeck(OpenFileDialog1.FileName)
-        CheckForTestability()
-        CurrentCard = ShuffledDeck(ShuffledDeck.Count - 1)
+        CardDeck.LoadCardsFromFile(OpenFileDialog1.FileName)
+        CurrentCard = CardDeck.Cards(0)
         NextCard()
         UpdateDisplay()
 
     End Sub
 
-    Private Sub CheckForTestability()
-        Left_Testable = False
-        Middle_Testable = False
-        Right_Testable = False
-        For Each iCard As ClsCard In FlashcardDeck
-            If iCard.Left <> "" Then Left_Testable = True
-            If iCard.Middle <> "" Then Middle_Testable = True
-            If iCard.Right <> "" Then Right_Testable = True
-        Next
-        Left_Tested = Left_Testable
-        BtnLeft_Tested.Enabled = Left_Testable
-        Update_BtnLeftTest_Display()
-        Middle_Tested = Middle_Testable
-        BtnMiddle_Tested.Enabled = Middle_Testable
-        Update_BtnMiddleTest_Display()
-        Right_Tested = Right_Testable
-        BtnRight_Tested.Enabled = Right_Testable
-        Update_BtnRightTest_Display()
-    End Sub
-
     Private Sub CheckTestEnablings()
         ' If all tests are disabled...
-        If Not Left_Tested And Not Middle_Tested And Not Right_Tested Then
+        If Not TestLeft And Not TestMiddle And Not TestRight Then
             Select Case LastToggledTest
                 Case CardSide.Left
                     ToggleMiddle()
@@ -99,74 +62,77 @@ Public Class FrmMain
 
     Private Sub UpdateDisplay()
         If CurrentCard Is Nothing Then
-            UpdateDisplay_Null()
+            BtnBack.Visible = False
+            BtnBack.Enabled = False
+            BtnNext.Visible = False
+            BtnNext.Enabled = False
+            BtnShow.Visible = False
+            BtnShow.Enabled = False
+            btnGood.Visible = False
+            btnGood.Enabled = False
+            btnSlow.Visible = False
+            btnSlow.Enabled = False
+            btnBad.Visible = False
+            btnBad.Enabled = False
+            LblLeft.Text = ""
+            LblMid.Text = ""
+            LblRight.Text = ""
         Else
-            EnableButtons()
-            UpdateDisplay_Valid()
+            BtnBack.Visible = True
+            BtnBack.Enabled = True
+            BtnNext.Visible = True
+            BtnNext.Enabled = True
+            'btnShow.Visible = True
+            'btnShow.Enabled = True
+            btnGood.Visible = True
+            btnGood.Enabled = True
+            btnSlow.Visible = True
+            btnSlow.Enabled = True
+            btnBad.Visible = True
+            btnBad.Enabled = True
+            Select Case ShowCards
+                Case True
+                    BtnShow.Enabled = False
+                    BtnShow.Visible = False
+                    SetLabelText(LblLeft, CurrentCard.Left)
+                    SetLabelText(LblMid, CurrentCard.Middle)
+                    SetLabelText(LblRight, CurrentCard.Right)
+                Case False
+                    BtnShow.Enabled = True
+                    BtnShow.Visible = True
+                    LblLeft.Text = ""
+                    LblMid.Text = ""
+                    LblRight.Text = ""
+                    Select Case CurrentSide
+                        Case CardSide.Left
+                            SetLabelText(LblLeft, CurrentCard.Left)
+                        Case CardSide.Middle
+                            SetLabelText(LblMid, CurrentCard.Middle)
+                        Case CardSide.Right
+                            SetLabelText(LblRight, CurrentCard.Right)
+                    End Select
+            End Select
         End If
-        BreakButtonFocus()
-    End Sub
-
-    Private Sub BreakButtonFocus()
         BtnShow.Focus()
         BtnShow.Select()
     End Sub
 
-    Private Sub UpdateDisplay_Null()
-        BtnBack.Visible = False
-        BtnBack.Enabled = False
-        BtnNext.Visible = False
-        BtnNext.Enabled = False
-        BtnShow.Visible = False
-        BtnShow.Enabled = False
-        btnGood.Visible = False
-        btnGood.Enabled = False
-        btnSlow.Visible = False
-        btnSlow.Enabled = False
-        btnBad.Visible = False
-        btnBad.Enabled = False
-        LblLeft.Text = ""
-        LblMid.Text = ""
-        LblRight.Text = ""
-    End Sub
-
-    Private Sub EnableButtons()
-        BtnBack.Visible = True
-        BtnBack.Enabled = True
-        BtnNext.Visible = True
-        BtnNext.Enabled = True
-        'btnShow.Visible = True
-        'btnShow.Enabled = True
-        btnGood.Visible = True
-        btnGood.Enabled = True
-        btnSlow.Visible = True
-        btnSlow.Enabled = True
-        btnBad.Visible = True
-        btnBad.Enabled = True
-    End Sub
-
-    Private Sub UpdateDisplay_Valid()
-        Select Case ShowCards
-            Case True
-                BtnShow.Enabled = False
-                BtnShow.Visible = False
-                SetLabelText(LblLeft, CurrentCard.Left)
-                SetLabelText(LblMid, CurrentCard.Middle)
-                SetLabelText(LblRight, CurrentCard.Right)
-            Case False
-                BtnShow.Enabled = True
-                BtnShow.Visible = True
-                LblLeft.Text = ""
-                LblMid.Text = ""
-                LblRight.Text = ""
-                Select Case CurrentSide
-                    Case CardSide.Left
-                        SetLabelText(LblLeft, CurrentCard.Left)
-                    Case CardSide.Middle
-                        SetLabelText(LblMid, CurrentCard.Middle)
-                    Case CardSide.Right
-                        SetLabelText(LblRight, CurrentCard.Right)
-                End Select
+    Private Sub FrmMain_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        Select Case e.KeyCode
+            Case 219
+                DoBack()
+            Case 221
+                DoNext()
+            Case 32, 65
+                DoShowCards()
+            Case 83
+                DoGood()
+            Case 68
+                DoSlow()
+            Case 70
+                DoBad()
+                'Case Else
+                'MsgBox("keyCode: " & e.KeyCode & vbNewLine & "keyData: " & e.KeyData & vbNewLine & "keyValue: " & e.KeyValue)
         End Select
     End Sub
 
@@ -246,9 +212,9 @@ Public Class FrmMain
 
     Private Sub DoBack()
         If BtnBack.Enabled Then
-            Dim nextIndex = ShuffledDeck.IndexOf(CurrentCard) - 1
-            If nextIndex < 0 Then nextIndex = ShuffledDeck.Count - 1
-            CurrentCard = ShuffledDeck(nextIndex)
+            Dim nextIndex = CardDeck.Cards.IndexOf(CurrentCard) - 1
+            If nextIndex < 0 Then nextIndex = CardDeck.Cards.Count - 1
+            CurrentCard = CardDeck.Cards(nextIndex)
             UpdateDisplay()
         End If
     End Sub
@@ -259,9 +225,9 @@ Public Class FrmMain
 
     Private Sub DoNext()
         If BtnNext.Enabled Then
-            Dim nextIndex = ShuffledDeck.IndexOf(CurrentCard) + 1
-            If nextIndex >= ShuffledDeck.Count Then nextIndex = 0
-            CurrentCard = ShuffledDeck(nextIndex)
+            Dim nextIndex = CardDeck.Cards.IndexOf(CurrentCard) + 1
+            If nextIndex >= CardDeck.Cards.Count Then nextIndex = 0
+            CurrentCard = CardDeck.Cards(nextIndex)
             UpdateDisplay()
         End If
     End Sub
@@ -286,12 +252,12 @@ Public Class FrmMain
 
     Private Sub ToggleLeft()
         If BtnLeft_Tested.Enabled Then
-            Left_Tested = Not Left_Tested
+            TestLeft = Not TestLeft
             Update_BtnLeftTest_Display()
         End If
     End Sub
     Private Sub Update_BtnLeftTest_Display()
-        Select Case Left_Tested
+        Select Case TestLeft
             Case True
                 BtnLeft_Tested.Text = "TEST"
             Case False
@@ -301,12 +267,12 @@ Public Class FrmMain
 
     Private Sub ToggleMiddle()
         If BtnMiddle_Tested.Enabled Then
-            Middle_Tested = Not Middle_Tested
+            TestMiddle = Not TestMiddle
             Update_BtnMiddleTest_Display()
         End If
     End Sub
     Private Sub Update_BtnMiddleTest_Display()
-        Select Case Middle_Tested
+        Select Case TestMiddle
             Case True
                 BtnMiddle_Tested.Text = "TEST"
             Case False
@@ -316,12 +282,12 @@ Public Class FrmMain
 
     Private Sub ToggleRight()
         If BtnRight_Tested.Enabled Then
-            Right_Tested = Not Right_Tested
+            TestRight = Not TestRight
             Update_BtnRightTest_Display()
         End If
     End Sub
     Private Sub Update_BtnRightTest_Display()
-        Select Case Right_Tested
+        Select Case TestRight
             Case True
                 BtnRight_Tested.Text = "TEST"
             Case False
@@ -337,4 +303,40 @@ Public Class FrmMain
         Dim fG As Graphics = Me.CreateGraphics
         drawTiledBG(fG, blueGridPic, ptOffset, -2, 1)
     End Sub
+
+    Public Sub NextCard()
+        ShowCards = False
+
+        Dim nextIndex As Integer = CardDeck.Cards.IndexOf(CurrentCard)
+        Dim nextCard As ClsCard
+        Dim nextSides As New HashSet(Of Integer)
+        Do
+            nextIndex += 1
+            If nextIndex = CardDeck.Cards.Count Then nextIndex = 0
+            nextCard = CardDeck.Cards(nextIndex)
+            If nextCard Is CurrentCard Then
+                MsgBox("You have memorized all the cards!" & vbNewLine & vbNewLine & "Now do it again!", vbOKOnly, "Congratulations!")
+                CardDeck.Shuffle()
+            Else
+                If TestLeft And nextCard.LeftNeedsTesting Then nextSides.Add(CardSide.Left)
+                If TestMiddle And nextCard.Middle_NeedsTesting Then nextSides.Add(CardSide.Middle)
+                If TestRight And nextCard.Right_NeedsTesting Then nextSides.Add(CardSide.Right)
+                If nextSides.Count > 0 Then
+                    CurrentSide = nextSides(Int(Rnd() * nextSides.Count))
+                    CurrentCard = nextCard
+                    Exit Do
+                End If
+            End If
+        Loop
+
+    End Sub
+
+    Private Sub DeleteCard(cardID As Integer, ByRef theDeck() As ClsCard, ByRef deckTotal As Integer)
+        deckTotal = deckTotal - 1
+        For intA As Integer = cardID To deckTotal
+            theDeck(intA) = theDeck(intA + 1)
+        Next
+        ReDim Preserve theDeck(deckTotal)
+    End Sub
+
 End Class

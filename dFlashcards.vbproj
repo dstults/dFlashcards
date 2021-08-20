@@ -87,6 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Code\ClsCard.vb" />
+    <Compile Include="Code\ClsDeck.vb" />
     <Compile Include="Code\ModCardHelper.vb" />
     <Compile Include="Code\FrmMain.vb">
       <SubType>Form</SubType>
