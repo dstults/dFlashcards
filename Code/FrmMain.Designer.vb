@@ -262,7 +262,7 @@ Partial Class FrmMain
         Me.KeyPreview = True
         Me.MaximizeBox = False
         Me.Name = "FrmMain"
-        Me.Text = "Darren's Flashcards (2019)"
+        Me.Text = "Darren's Flashcards"
         Me.ResumeLayout(False)
 
     End Sub

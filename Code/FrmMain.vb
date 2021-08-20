@@ -1,7 +1,7 @@
 ﻿
 Public Class FrmMain
 
-    Private Const versionSplash As String = "2021-08-20 / v1.1.0"
+    Private Const versionSplash As String = "2021-08-20 / v1.1.0b"
     'private fG As Graphics = Me.CreateGraphics
 
     Private showCards As Boolean
@@ -22,6 +22,7 @@ Public Class FrmMain
 
     Private Sub FlashMan_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
+        Me.Text = $"Darren's Flashcards [ {versionSplash} ]"
         OpenFileDialog1.InitialDirectory = Application.StartupPath
         UpdateDisplay()
 
@@ -167,7 +168,7 @@ Public Class FrmMain
     End Sub
 
     Private Sub LblAbout_Click(sender As Object, e As EventArgs) Handles lblAbout.Click
-        MsgBox("Darren's Flashcards! (dFlashcards.exe)" & vbNewLine & vbNewLine & "Current version:  " & versionSplash & vbNewLine & vbNewLine & "For any questions please contact:" & vbNewLine & "Darren" & vbNewLine & "drankof@gmail.com", vbOKOnly, versionSplash)
+        MsgBox($"Darren's Flashcards! (dFlashcards.exe){vbNewLine}{vbNewLine}Current version:  {versionSplash}{vbNewLine}{vbNewLine}For any questions please contact:{vbNewLine}Darren{vbNewLine}drankof@gmail.com", vbOKOnly, "About")
     End Sub
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
