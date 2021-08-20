@@ -31,6 +31,18 @@ Learn any language by making super easy flashcard files and then memorizing all 
 - ProTip #2: Use the indicated keyboard shortcuts for faster memorization.
 - ProTip #3: You can hit "Good" "Slow" "Bad" even without showing the cards.
 
+# How to Make your own Flashcards
+
+1) Make a new text file.
+2) Every card is one line of text.
+3) Use vertical bars **|** (shift-\) to separate sides of one card.
+4) A two-sided card should have one vertical bar, a three-sided card should have two vertical bars.
+5) Here is a screenshot of a sample card file:
+
+![image](https://user-images.githubusercontent.com/20900852/130286116-2f577cc7-eefc-4f32-96df-020f7c24ccc0.png)
+
+6) The cards are designed to auto-scale, but results may vary. Feel [free to post an issue](https://github.com/dstults/dFlashcards/issues) if you find one.
+
 # Future Plans ?
 
 - Add more sample cards
