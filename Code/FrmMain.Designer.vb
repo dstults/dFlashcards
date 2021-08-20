@@ -39,6 +39,7 @@ Partial Class FrmMain
         Me.BtnRight_Tested = New System.Windows.Forms.Button()
         Me.lblAbout = New System.Windows.Forms.Label()
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
+        Me.BtnAlwaysShow = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'BtnOpen
@@ -227,10 +228,22 @@ Partial Class FrmMain
         Me.Timer1.Enabled = True
         Me.Timer1.Interval = 30
         '
+        'BtnAlwaysShow
+        '
+        Me.BtnAlwaysShow.Font = New System.Drawing.Font("SimSun", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.BtnAlwaysShow.Location = New System.Drawing.Point(124, 21)
+        Me.BtnAlwaysShow.Name = "BtnAlwaysShow"
+        Me.BtnAlwaysShow.Size = New System.Drawing.Size(171, 34)
+        Me.BtnAlwaysShow.TabIndex = 14
+        Me.BtnAlwaysShow.TabStop = False
+        Me.BtnAlwaysShow.Text = "Always Show"
+        Me.BtnAlwaysShow.UseVisualStyleBackColor = True
+        '
         'FrmMain
         '
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None
         Me.ClientSize = New System.Drawing.Size(901, 399)
+        Me.Controls.Add(Me.BtnAlwaysShow)
         Me.Controls.Add(Me.BtnShow)
         Me.Controls.Add(Me.lblAbout)
         Me.Controls.Add(Me.BtnRight_Tested)
@@ -269,4 +282,5 @@ Partial Class FrmMain
     Friend WithEvents BtnMiddle_Tested As Button
     Friend WithEvents BtnRight_Tested As Button
     Friend WithEvents lblAbout As Label
+    Friend WithEvents BtnAlwaysShow As Button
 End Class
