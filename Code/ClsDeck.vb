@@ -52,12 +52,19 @@
         Dim fileData As String = IO.File.ReadAllText(filePath)
         Dim fileLines As String() = fileData.Split(vbNewLine)
         Dim newDeck As New List(Of ClsCard)
+        Dim trimmed As String
 
         For Each line As String In fileLines
             currentLineNumber += 1
-            Dim lineData As String() = line.Split("|"c)
+
+            ' clean up input, we will ignore pure whitespcae
+            trimmed = line.Trim()
+            If String.IsNullOrEmpty(trimmed) Then Continue For
+
+            ' get data and add to deck, make sure it's a 2- or 3-sided card
+            Dim lineData As String() = trimmed.Split("|"c)
             If lineData.Length <= 1 OrElse lineData.Length > 3 Then
-                MsgBox($"Invalid Card Data (Line {currentLineNumber}): {vbNewLine}{line}")
+                MsgBox($"Invalid Card Data (Line {currentLineNumber}): {vbNewLine}{trimmed}")
                 If errorCount >= 3 Then
                     MsgBox("Too many errors, aborting file load!")
                     Exit Sub
@@ -73,12 +80,11 @@
             Cards = newDeck
             CardDeck.Shuffle()
             CheckSideTestability()
-            CurrentCard = Nothing
         End If
 
     End Sub
 
-    Public Sub LowerScoreBasedOnHistory()
+    Public Sub Rescore()
         For Each card As ClsCard In Cards
             ' Make the next round remember and retest any cards that were troublesome last round.
             If card.Left_BadHistory Then

@@ -1,12 +1,18 @@
 ﻿
 Public Class FrmMain
 
-    Private LastToggledTest As Integer
     Private VersionSplash As String = "2021-08-20 / v1.1.0"
-    'Public fG As Graphics = Me.CreateGraphics
-    Public TestLeft As Boolean = True
-    Public TestMiddle As Boolean = True
-    Public TestRight As Boolean = True
+    'private fG As Graphics = Me.CreateGraphics
+
+    Private ShowCards As Boolean
+
+    Private CurrentCard As ClsCard = Nothing
+    Private CurrentSide As CardSide = CardSide.Unset
+    Private LastToggledTest As CardSide = CardSide.Unset
+
+    Private TestLeft As Boolean = True
+    Private TestMiddle As Boolean = True
+    Private TestRight As Boolean = True
 
     Private Sub FrmMain_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
         Application.Exit()
@@ -37,84 +43,14 @@ Public Class FrmMain
         End If
 
         CardDeck.LoadCardsFromFile(OpenFileDialog1.FileName)
-        CurrentCard = CardDeck.Cards(0)
-        NextCard()
+        If CardDeck.Cards.Count > 0 Then
+            CurrentCard = CardDeck.Cards(0)
+            NextCard()
+        Else
+            CurrentCard = Nothing
+        End If
         UpdateDisplay()
 
-    End Sub
-
-    Private Sub CheckTestEnablings()
-        ' If all tests are disabled...
-        If Not TestLeft And Not TestMiddle And Not TestRight Then
-            Select Case LastToggledTest
-                Case CardSide.Left
-                    ToggleMiddle()
-                    ToggleRight()
-                Case CardSide.Middle
-                    ToggleLeft()
-                    ToggleRight()
-                Case CardSide.Right
-                    ToggleLeft()
-                    ToggleMiddle()
-            End Select
-        End If
-    End Sub
-
-    Private Sub UpdateDisplay()
-        If CurrentCard Is Nothing Then
-            BtnBack.Visible = False
-            BtnBack.Enabled = False
-            BtnNext.Visible = False
-            BtnNext.Enabled = False
-            BtnShow.Visible = False
-            BtnShow.Enabled = False
-            btnGood.Visible = False
-            btnGood.Enabled = False
-            btnSlow.Visible = False
-            btnSlow.Enabled = False
-            btnBad.Visible = False
-            btnBad.Enabled = False
-            LblLeft.Text = ""
-            LblMid.Text = ""
-            LblRight.Text = ""
-        Else
-            BtnBack.Visible = True
-            BtnBack.Enabled = True
-            BtnNext.Visible = True
-            BtnNext.Enabled = True
-            'btnShow.Visible = True
-            'btnShow.Enabled = True
-            btnGood.Visible = True
-            btnGood.Enabled = True
-            btnSlow.Visible = True
-            btnSlow.Enabled = True
-            btnBad.Visible = True
-            btnBad.Enabled = True
-            Select Case ShowCards
-                Case True
-                    BtnShow.Enabled = False
-                    BtnShow.Visible = False
-                    SetLabelText(LblLeft, CurrentCard.Left)
-                    SetLabelText(LblMid, CurrentCard.Middle)
-                    SetLabelText(LblRight, CurrentCard.Right)
-                Case False
-                    BtnShow.Enabled = True
-                    BtnShow.Visible = True
-                    LblLeft.Text = ""
-                    LblMid.Text = ""
-                    LblRight.Text = ""
-                    Select Case CurrentSide
-                        Case CardSide.Left
-                            SetLabelText(LblLeft, CurrentCard.Left)
-                        Case CardSide.Middle
-                            SetLabelText(LblMid, CurrentCard.Middle)
-                        Case CardSide.Right
-                            SetLabelText(LblRight, CurrentCard.Right)
-                    End Select
-            End Select
-        End If
-        BtnShow.Focus()
-        BtnShow.Select()
     End Sub
 
     Private Sub FrmMain_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
@@ -232,69 +168,6 @@ Public Class FrmMain
         End If
     End Sub
 
-    Private Sub BtnLeft_Tested_Click(sender As Object, e As EventArgs) Handles BtnLeft_Tested.Click
-        LastToggledTest = CardSide.Left
-        ToggleLeft()
-        CheckTestEnablings()
-    End Sub
-
-    Private Sub BtnMiddle_Tested_Click(sender As Object, e As EventArgs) Handles BtnMiddle_Tested.Click
-        LastToggledTest = CardSide.Middle
-        ToggleMiddle()
-        CheckTestEnablings()
-    End Sub
-
-    Private Sub BtnRight_Tested_Click(sender As Object, e As EventArgs) Handles BtnRight_Tested.Click
-        LastToggledTest = CardSide.Right
-        ToggleRight()
-        CheckTestEnablings()
-    End Sub
-
-    Private Sub ToggleLeft()
-        If BtnLeft_Tested.Enabled Then
-            TestLeft = Not TestLeft
-            Update_BtnLeftTest_Display()
-        End If
-    End Sub
-    Private Sub Update_BtnLeftTest_Display()
-        Select Case TestLeft
-            Case True
-                BtnLeft_Tested.Text = "TEST"
-            Case False
-                BtnLeft_Tested.Text = "ignore"
-        End Select
-    End Sub
-
-    Private Sub ToggleMiddle()
-        If BtnMiddle_Tested.Enabled Then
-            TestMiddle = Not TestMiddle
-            Update_BtnMiddleTest_Display()
-        End If
-    End Sub
-    Private Sub Update_BtnMiddleTest_Display()
-        Select Case TestMiddle
-            Case True
-                BtnMiddle_Tested.Text = "TEST"
-            Case False
-                BtnMiddle_Tested.Text = "ignore"
-        End Select
-    End Sub
-
-    Private Sub ToggleRight()
-        If BtnRight_Tested.Enabled Then
-            TestRight = Not TestRight
-            Update_BtnRightTest_Display()
-        End If
-    End Sub
-    Private Sub Update_BtnRightTest_Display()
-        Select Case TestRight
-            Case True
-                BtnRight_Tested.Text = "TEST"
-            Case False
-                BtnRight_Tested.Text = "ignore"
-        End Select
-    End Sub
-
     Private Sub LblAbout_Click(sender As Object, e As EventArgs) Handles lblAbout.Click
         MsgBox("Darren's Flashcards! (dFlashcards.exe)" & vbNewLine & vbNewLine & "Made with VB.net in VS 2017 Community Edition." & vbNewLine & "Major Version Date: 2019" & vbNewLine & vbNewLine & "For any questions please contact:" & vbNewLine & "Darren" & vbNewLine & "drankof@gmail.com", vbOKOnly, VersionSplash)
     End Sub
@@ -317,6 +190,7 @@ Public Class FrmMain
             If nextCard Is CurrentCard Then
                 MsgBox("You have memorized all the cards!" & vbNewLine & vbNewLine & "Now do it again!", vbOKOnly, "Congratulations!")
                 CardDeck.Shuffle()
+                CardDeck.Rescore()
             Else
                 If TestLeft And nextCard.LeftNeedsTesting Then nextSides.Add(CardSide.Left)
                 If TestMiddle And nextCard.Middle_NeedsTesting Then nextSides.Add(CardSide.Middle)
@@ -337,6 +211,116 @@ Public Class FrmMain
             theDeck(intA) = theDeck(intA + 1)
         Next
         ReDim Preserve theDeck(deckTotal)
+    End Sub
+
+
+    Private Sub UpdateDisplay()
+        Dim enableButtons As Boolean = CurrentCard IsNot Nothing
+        BtnBack.Visible = enableButtons
+        BtnBack.Enabled = enableButtons
+        BtnNext.Visible = enableButtons
+        BtnNext.Enabled = enableButtons
+        BtnShow.Visible = enableButtons
+        BtnShow.Enabled = enableButtons
+        btnGood.Visible = enableButtons
+        btnGood.Enabled = enableButtons
+        btnSlow.Visible = enableButtons
+        btnSlow.Enabled = enableButtons
+        btnBad.Visible = enableButtons
+        btnBad.Enabled = enableButtons
+
+        If Not enableButtons Then
+            LblLeft.Text = ""
+            LblMid.Text = ""
+            LblRight.Text = ""
+
+        Else
+            Select Case ShowCards
+                Case True
+                    BtnShow.Enabled = False
+                    BtnShow.Visible = False
+                    SetLabelText(LblLeft, CurrentCard.Left)
+                    SetLabelText(LblMid, CurrentCard.Middle)
+                    SetLabelText(LblRight, CurrentCard.Right)
+                Case False
+                    BtnShow.Enabled = True
+                    BtnShow.Visible = True
+                    LblLeft.Text = ""
+                    LblMid.Text = ""
+                    LblRight.Text = ""
+                    Select Case CurrentSide
+                        Case CardSide.Left
+                            SetLabelText(LblLeft, CurrentCard.Left)
+                        Case CardSide.Middle
+                            SetLabelText(LblMid, CurrentCard.Middle)
+                        Case CardSide.Right
+                            SetLabelText(LblRight, CurrentCard.Right)
+                    End Select
+            End Select
+        End If
+
+        BtnLeft_Tested.Enabled = enableButtons
+        BtnMiddle_Tested.Enabled = enableButtons
+        BtnRight_Tested.Enabled = enableButtons
+        Select Case TestLeft
+            Case True
+                BtnLeft_Tested.Text = "TEST"
+            Case False
+                BtnLeft_Tested.Text = "ignore"
+        End Select
+        Select Case TestMiddle
+            Case True
+                BtnMiddle_Tested.Text = "TEST"
+            Case False
+                BtnMiddle_Tested.Text = "ignore"
+        End Select
+        Select Case TestRight
+            Case True
+                BtnRight_Tested.Text = "TEST"
+            Case False
+                BtnRight_Tested.Text = "ignore"
+        End Select
+
+        BtnShow.Focus()
+        BtnShow.Select()
+    End Sub
+
+    Private Sub BtnLeft_Tested_Click(sender As Object, e As EventArgs) Handles BtnLeft_Tested.Click
+        LastToggledTest = CardSide.Left
+        TestLeft = Not TestLeft
+        CheckTestEnablings()
+        UpdateDisplay()
+    End Sub
+
+    Private Sub BtnMiddle_Tested_Click(sender As Object, e As EventArgs) Handles BtnMiddle_Tested.Click
+        LastToggledTest = CardSide.Middle
+        TestMiddle = Not TestMiddle
+        CheckTestEnablings()
+        UpdateDisplay()
+    End Sub
+
+    Private Sub BtnRight_Tested_Click(sender As Object, e As EventArgs) Handles BtnRight_Tested.Click
+        LastToggledTest = CardSide.Right
+        TestRight = Not TestRight
+        CheckTestEnablings()
+        UpdateDisplay()
+    End Sub
+
+    Private Sub CheckTestEnablings()
+        ' If all tests are disabled...
+        If Not TestLeft And Not TestMiddle And Not TestRight Then
+            Select Case LastToggledTest
+                Case CardSide.Left
+                    TestMiddle = Not TestMiddle
+                    TestRight = Not TestRight
+                Case CardSide.Middle
+                    TestLeft = Not TestLeft
+                    TestRight = Not TestRight
+                Case CardSide.Right
+                    TestLeft = Not TestLeft
+                    TestMiddle = Not TestMiddle
+            End Select
+        End If
     End Sub
 
 End Class
